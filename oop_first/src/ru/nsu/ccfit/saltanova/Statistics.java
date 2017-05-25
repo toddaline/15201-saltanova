@@ -59,10 +59,11 @@ public class Statistics {
     }
 
     void printStatistics() {
-        System.out.println("Total - " + totalLinesCount + " lines in " + totalFilesCount + " files");
         if (sortedArray.size() == 0) {
             sort();
         }
+        System.out.println("Total - " + totalLinesCount + " lines in " + totalFilesCount + " files");
+        System.out.println("------------");
         for (SortedStatisticData aSortedArray : sortedArray) {
             System.out.println(aSortedArray.filter.getFilter() + " - " + aSortedArray.linesCount + " line(s) in " + aSortedArray.filesCount + " file(s)");
         }
