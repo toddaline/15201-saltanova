@@ -1,0 +1,69 @@
+<project name="LoC" default="all" basedir=".">
+
+    <property name="project.name" value="LoC"/>
+
+    <property name="package" value="model"/>
+    <property name="main.class" value="build.Main"/>
+    <property name="src.dir" location="src/ru/nsu/ccfit/saltanova"/>
+    <property name="build.dir" location="build"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="test.dir" location="Tests/ru/nsu/ccfit/saltanova"/>
+    <property name="test-build.dir" location="test-build"/>
+
+    <target name="all" depends="clean, compile, init, dist, test-compile"/>
+
+    <path id="libraries">
+        <fileset dir="${lib.dir}" includes="javac2-7.0.3.jar"/>
+        <fileset dir="${lib.dir}" includes="log4j-api-2.8.1.jar"/>
+        <fileset dir="${lib.dir}" includes="log4j-core-2.8.1.jar"/>
+    </path>
+
+    <target name="init" depends="clean">
+        <mkdir dir="${build.dir}"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac classpathref="libraries" srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" fork="true" />
+    </target>
+
+    <target name="dist" depends="compile">
+        <jar destfile="${project.name}.jar" basedir="${build.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="ru.nsu.ccfit.saltanova.Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="test-compile" depends="compile, dist">
+        <mkdir dir="${test-build.dir}" />
+        <javac srcdir="${test.dir}" destdir="${test-build.dir}" includeantruntime="false">
+            <classpath>
+                <pathelement location="${lib.dir}/junit-4.12.jar"/>
+                <pathelement location="${lib.dir}/hamcrest-core-1.3.jar"/>
+                <pathelement location="${project.name}.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" depends="test-compile">
+        <junit>
+            <classpath>
+                <pathelement location="${lib.dir}/junit-4.12.jar"/>
+                <pathelement location="${lib.dir}/hamcrest-core-1.3.jar"/>
+                <pathelement location="${project.name}.jar" />
+                <pathelement location="${test-build.dir}" />
+            </classpath>
+            <formatter type="brief" usefile="false" />
+            <batchtest>
+                <fileset dir="${test-build.dir}" includes="**/*Test.class" />
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${test-build.dir}"/>
+        <delete file="${project.name}.jar"/>
+    </target>
+
+</project>
