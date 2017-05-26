@@ -17,12 +17,12 @@ public class Controller {
     }
 
     public void findCorrect(File file) {
-        stats.countFiles();
         boolean flag = false;
         int linesCount = 0;
         for (IFilter filter : filters) {
             if (filter.check(file)) {
                 if (!flag) {
+                    stats.countFiles();
                     linesCount = stats.countLines(file);
                     flag = true;
                 }
