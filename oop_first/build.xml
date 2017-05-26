@@ -2,7 +2,6 @@
 
     <property name="project.name" value="LoC"/>
 
-    <property name="package" value="model"/>
     <property name="main.class" value="build.Main"/>
     <property name="src.dir" location="src/ru/nsu/ccfit/saltanova"/>
     <property name="build.dir" location="build"/>
@@ -12,18 +11,12 @@
 
     <target name="all" depends="clean, compile, init, dist, test-compile"/>
 
-    <path id="libraries">
-        <fileset dir="${lib.dir}" includes="javac2-7.0.3.jar"/>
-        <fileset dir="${lib.dir}" includes="log4j-api-2.8.1.jar"/>
-        <fileset dir="${lib.dir}" includes="log4j-core-2.8.1.jar"/>
-    </path>
-
     <target name="init" depends="clean">
         <mkdir dir="${build.dir}"/>
     </target>
 
     <target name="compile" depends="init">
-        <javac classpathref="libraries" srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" fork="true" />
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" fork="true" />
     </target>
 
     <target name="dist" depends="compile">
