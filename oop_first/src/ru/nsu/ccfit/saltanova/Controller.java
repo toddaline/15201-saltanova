@@ -18,9 +18,14 @@ public class Controller {
 
     public void findCorrect(File file) {
         stats.countFiles();
-        int linesCount = stats.countLines(file);
+        boolean flag = false;
+        int linesCount = 0;
         for (IFilter filter : filters) {
             if (filter.check(file)) {
+                if (!flag) {
+                    linesCount = stats.countLines(file);
+                    flag = true;
+                }
                 stats.addMatchingFile(filter, linesCount);
             }
         }
