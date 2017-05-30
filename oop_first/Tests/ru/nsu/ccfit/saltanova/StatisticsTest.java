@@ -21,8 +21,8 @@ public class StatisticsTest {
 
     @Test
     public void countLines() throws Exception {
-        File file1 = new File("Tests\\ru\\nsu\\ccfit\\saltanova\\testDir\\testfile.txt");
-        File file2 = new File("Tests\\ru\\nsu\\ccfit\\saltanova\\testDir\\testfileLong.txt");
+        File file1 = new File("Tests/ru/nsu/ccfit/saltanova/testDir/testfile.txt");
+        File file2 = new File("Tests/ru/nsu/ccfit/saltanova/testDir/testfileLong.txt");
         Statistics stats = new Statistics();
         stats.countLines(file1);
         stats.countLines(file2);
