@@ -11,7 +11,7 @@ public class FilterCheckTest {
     public void check() throws Exception {
         String goodStringForAll = ".txt >0";
         String badStringforAnd = ".txt .cpp";
-        File file = new File("Tests\\ru\\nsu\\ccfit\\saltanova\\testDir\\testfile.txt");
+        File file = new File("Tests/ru/nsu/ccfit/saltanova/testDir/testfile.txt");
 
         AndFilter and = new AndFilter(goodStringForAll);
         AndFilter and2 = new AndFilter(badStringforAnd);
