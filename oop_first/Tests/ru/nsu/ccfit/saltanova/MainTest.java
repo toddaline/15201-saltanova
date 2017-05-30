@@ -11,8 +11,8 @@ public class MainTest {
     @Test
     public void controllerTest() {
         try {
-            Controller ctrl = new Controller("Tests\\ru\\nsu\\ccfit\\saltanova\\config.txt");
-            ctrl.bypass("Tests\\ru\\nsu\\ccfit\\saltanova\\testDir");
+            Controller ctrl = new Controller("Tests/ru/nsu/ccfit/saltanova/config.txt");
+            ctrl.bypass("Tests/ru/nsu/ccfit/saltanova/testDir");
             ctrl.getStatistics().sort();
             ArrayList<Statistics.SortedStatisticData> stats = ctrl.getStatistics().getStatistics();
 
