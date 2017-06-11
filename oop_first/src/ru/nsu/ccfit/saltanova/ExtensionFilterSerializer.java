@@ -7,6 +7,6 @@ public class ExtensionFilterSerializer implements ISerializer {
         if (line.length()<2) {
             throw new FilterSerializerException("String with prefix '<' is too short");
         }
-        return new ExtensionFilter(line.substring(1));
+        return new ExtensionFilter(line);
     }
 }
