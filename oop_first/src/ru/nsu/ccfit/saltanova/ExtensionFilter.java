@@ -10,13 +10,13 @@ public class ExtensionFilter implements IFilter {
     }
 
     @Override
-    public boolean check(File pathname) {   //файл для проверки
+    public boolean check(File pathname) {
             return pathname.getName().endsWith(str);
         }
 
     @Override
     public String getFilter() {
-        return prefix + str;
+        return str;
     }
 
     @Override
