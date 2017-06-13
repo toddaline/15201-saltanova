@@ -22,6 +22,10 @@ import java.io.OutputStreamWriter;
         private JLabel numberOfAccessories = new JLabel("0");
         private JLabel dealerLabel = new JLabel("Dealer  |  Cars");
         private JLabel numberOfCars = new JLabel("0");
+        private JLabel bodiesTotal = new JLabel("0");
+        private JLabel enginesTotal = new JLabel("0");
+        private JLabel accessoriesTotal = new JLabel("0");
+        private JLabel carsTotal = new JLabel("0");
 
         private JSlider speedOfBodySuppliersSlider = new JSlider(JSlider.HORIZONTAL, 0, 3000, 0);
         private JSlider speedOfEngineSuppliersSlider = new JSlider(JSlider.HORIZONTAL, 0, 3000, 0);
@@ -62,12 +66,27 @@ import java.io.OutputStreamWriter;
         void setNumberOfAccessories(Integer label) {
             numberOfAccessories.setText(label.toString());
         }
-        void setNumberOfCars(Integer label) { numberOfCars.setText(label.toString()); }
+        void setNumberOfCars(Integer label) { 
+            numberOfCars.setText(label.toString()); 
+        }
+        
+        void setBodiesTotal(Integer label) {
+            bodiesTotal.setText(label.toString());
+        }
+        void setEnginesTotal(Integer label) {
+            enginesTotal.setText(label.toString());
+        }
+        void setAccessoriesTotal(Integer label) {
+            accessoriesTotal.setText(label.toString());
+        }
+        void setCarsTotal(Integer label) {
+            carsTotal.setText(label.toString());
+        }
 
         public SimpleGUI(OutputStreamWriter fout, Factory f) {
             super("Factory");
             factory = f;
-            this.setBounds(0, 0, 600, 250);
+            this.setBounds(0, 0, 700, 250);
             WindowListener exitListener = new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {
                     if (fout != null){
@@ -115,10 +134,15 @@ import java.io.OutputStreamWriter;
 
             container3.setLayout(new GridLayout(5,1));
             container3.add(new JLabel("Stock:             "));
+            container3.add(new JLabel("Total:"));
             container3.add(numberOfBodies);
+            container3.add(bodiesTotal);
             container3.add(numberOfEngines);
+            container3.add(enginesTotal);
             container3.add(numberOfAccessories);
+            container3.add(accessoriesTotal);
             container3.add(numberOfCars);
+            container3.add(carsTotal);
 
             this.getContentPane().add(container, BorderLayout.WEST);
             this.getContentPane().add(container2, BorderLayout.CENTER);
