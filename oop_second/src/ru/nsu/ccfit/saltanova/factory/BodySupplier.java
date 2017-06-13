@@ -30,6 +30,7 @@ public class BodySupplier implements Runnable {
                 Body newBody = new Body(bodyID++);
                 stock.put(newBody);
                 setBody(stock.getSize());
+                setBodyTotal(bodyID);
             } catch (InterruptedException e) {
                 log.info("BodySupplier was interrupted");
             }
