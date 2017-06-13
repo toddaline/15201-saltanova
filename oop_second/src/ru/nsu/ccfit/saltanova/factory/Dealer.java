@@ -15,7 +15,7 @@ public class Dealer implements Runnable {
     private int timeout;
     private CarStock stock;
 
-    private final static Logger log = LogManager.getLogger(Dealer.class);
+    private final static Logger log = LogManager.getLogger("logger");
 
     Dealer(int t, CarStock s) {
         timeout = t;
@@ -38,7 +38,7 @@ public class Dealer implements Runnable {
                 sleep(timeout);
             }
         } catch(InterruptedException e){
-            System.out.println("Dealer" + Thread.currentThread().getName() + " was interrupted");
+            log.info("Dealer" + Thread.currentThread().getName() + " was interrupted");
         }
     }
 }
