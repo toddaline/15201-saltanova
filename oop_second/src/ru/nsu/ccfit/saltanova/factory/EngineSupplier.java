@@ -31,6 +31,7 @@ public class EngineSupplier implements Runnable {
                 Engine newEngine = new Engine(bodyID++);
                 stock.put(newEngine);
                 setEngine(stock.getSize());
+                setEngineTotal(engineID);
             }
         } catch (InterruptedException e) {
             log.info("EngineSupplier was interrupted");
