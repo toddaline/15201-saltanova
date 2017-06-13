@@ -9,7 +9,7 @@ import static ru.nsu.ccfit.saltanova.AppController.*;
 public class AccessorySupplier implements Runnable {
 
     private static final Logger log = LogManager.getLogger("logger");
-    private static int accessoryID = 0;
+    AtomicInteger accessoryID = new AtomicInteger(0);
     private int timeout;
     private Stock<Accessory> stock;
 
@@ -28,9 +28,10 @@ public class AccessorySupplier implements Runnable {
         while(true) {
             try {
                 sleep(timeout);
-                Accessory newAccessory = new Accessory(accessoryID++);
+                Accessory newAccessory = new Accessory(accessoryID.incrementAndGet());
                 stock.put(newAccessory);
                 setAccessory(stock.getSize());
+                setAccessoryTotal(accessoryID.get());
             } catch (InterruptedException e) {
                 log.info("AccessorySupplier was interrupted");
             }
