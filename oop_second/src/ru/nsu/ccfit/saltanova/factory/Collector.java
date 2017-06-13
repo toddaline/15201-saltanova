@@ -7,7 +7,7 @@ import static ru.nsu.ccfit.saltanova.AppController.*;
 
 public class Collector {
 
-    private static int numberOfCar = 0;
+    private static AtomicInteger numberOfCar = new AtomicInteger(0);
     private static final Logger log = LogManager.getLogger("logger");
     private Stock<Body> bodyStock;
     private Stock<Engine> engineStock;
@@ -44,7 +44,7 @@ public class Collector {
         @Override
         public void run () {
             try {
-                Car newCar = new Car(bodyStock.get(), accessoryStock.get(), engineStock.get(), numberOfCar++);
+                Car newCar = new Car(bodyStock.get(), accessoryStock.get(), engineStock.get(), numberOfCar.incrementAndGet());
                 carStock.put(newCar);
                 setBody(bodyStock.getSize());
                 setEngine(engineStock.getSize());
