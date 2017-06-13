@@ -3,6 +3,8 @@ package ru.nsu.ccfit.saltanova.factory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static java.lang.Thread.sleep;
 import static ru.nsu.ccfit.saltanova.AppController.*;
 
