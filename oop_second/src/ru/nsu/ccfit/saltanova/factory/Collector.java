@@ -50,6 +50,7 @@ public class Collector {
                 setEngine(engineStock.getSize());
                 setAccessory((accessoryStock.getSize()));
                 setCar(carStock.getSize());
+                setCarTotal(numberOfCar.get());
             } catch (InterruptedException e) {
                 log.info(Thread.currentThread().getName() + " was interrupted");
             }
