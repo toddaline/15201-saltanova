@@ -9,7 +9,7 @@ import static ru.nsu.ccfit.saltanova.AppController.*;
 public class BodySupplier implements Runnable {
 
     private static final Logger log = LogManager.getLogger("logger");
-    private static int bodyID = 0;
+    AtomicInteger bodyID = new AtomicInteger(0);
     private int timeout;
     private Stock<Body> stock;
 
@@ -27,10 +27,10 @@ public class BodySupplier implements Runnable {
         while(true) {
             try {
                 sleep(timeout);
-                Body newBody = new Body(bodyID++);
+                Body newBody = new Body(bodyID.incrementAndGet());
                 stock.put(newBody);
                 setBody(stock.getSize());
-                setBodyTotal(bodyID);
+                setBodyTotal(bodyID.get());
             } catch (InterruptedException e) {
                 log.info("BodySupplier was interrupted");
             }
