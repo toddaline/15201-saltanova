@@ -117,6 +117,9 @@ public class Server {
         }
         if (xmlListener.isAlive()) {
             log.info("xml thread wasnt interrupted");
+
+
+
         }
     }
 
