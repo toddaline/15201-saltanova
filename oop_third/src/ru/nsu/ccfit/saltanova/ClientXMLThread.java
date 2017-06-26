@@ -42,7 +42,7 @@ public class ClientXMLThread extends AllClientThreads {
         docMessagesQueue = new LinkedBlockingQueue<>();
         serverHandler = new ServerHandler(messagesQueue);
         clientHandlerXML = new ClientHandlerXML(docMessagesQueue);
-
+        log.info("new xml client");
         reader = new Thread(new ClientReader());
         writer = new Thread(new ClientWriter());
         reader.start();
@@ -54,18 +54,17 @@ public class ClientXMLThread extends AllClientThreads {
         public void run() {
             try {
                 while (true) {
-                    int length = inputStream.readInt();  // + обработка если длина отрицательная?
+                    int length = inputStream.readInt();
+                    if (length < 0) {
+                         throw new UnknownMessageTypeException();
+                    }
                     byte[] buffer = new byte[length];
                     int read = 0;
                     while (read != length) {
                         int temp = inputStream.read(buffer, read, length - read);
                         read += temp;
                     }
-                // проверка на то что длина сообщения действительно такая?
 
-                    if (buffer == null) {   //чет подумать надо че с этим делать
-                        break;
-                    }
                     DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                     Document document = documentBuilder.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(buffer, 0, length), "UTF-8")));
                     Node root = document.getDocumentElement();
@@ -74,7 +73,6 @@ public class ClientXMLThread extends AllClientThreads {
                         case "login" :
                             message = new AddUserMessage(document.getElementsByTagName("name").item(0).getTextContent(), document.getElementsByTagName("type").item(0).getTextContent());
                             break;
-                            // +type - xml
                         case "list" :
                             message = new RequestList(Integer.parseInt(document.getElementsByTagName("session").item(0).getTextContent()));
                             break;
@@ -85,8 +83,10 @@ public class ClientXMLThread extends AllClientThreads {
                         case "logout" :
                             message = new Logout(Integer.parseInt(document.getElementsByTagName("session").item(0).getTextContent()));
                     }
-                    log.info("received message from client");
-
+                    if (message == null) {
+                        throw new UnknownMessageTypeException();
+                    }
+                    log.info("received message from client: " + message.getClass().getName());
                     message.process(serverHandler);
                 }
             } catch (IOException e) {
@@ -94,8 +94,10 @@ public class ClientXMLThread extends AllClientThreads {
                 log.info("disconnected");
             } catch (ParserConfigurationException | SAXException e) {
                 e.printStackTrace();
-            }
-            finally {
+            } catch (UnknownMessageTypeException e) {
+                banUser();
+                writer.interrupt();
+            } finally {
                 log.info("reader closed");
             }
         }
@@ -109,7 +111,7 @@ public class ClientXMLThread extends AllClientThreads {
                     ServerMessage message = (ServerMessage)messagesQueue.take();
                     message.process(clientHandlerXML);
                     sendMessage();
-                    log.info("sending message to client");
+                    log.info("sending message to client: " + message.getClass().getName());
                 }
             } catch (InterruptedException e) {
                 log.info("thread was interrupted");
@@ -143,7 +145,10 @@ public class ClientXMLThread extends AllClientThreads {
     }
 
     @Override
-    void banUser() {
-
+    public void banUser() {
+        log.info("user was banned");
+        messagesQueue.clear();
+        serverHandler.deleteUser();
+        stop();
     }
 }

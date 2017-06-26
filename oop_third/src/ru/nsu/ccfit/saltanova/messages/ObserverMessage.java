@@ -1,7 +1,7 @@
 package ru.nsu.ccfit.saltanova.messages;
 
 
-public interface ObserverMessage {          //rename
+public interface ObserverMessage {
 
     void process(ServerTextMessage message);
 

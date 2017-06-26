@@ -1,6 +1,6 @@
 package ru.nsu.ccfit.saltanova.messages;
 
-public interface ClientMessage extends Message {    //обрабатываются сервером
+public interface ClientMessage extends Message {
 
     void process(IServerHandler server);
 

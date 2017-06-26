@@ -14,7 +14,7 @@ public class ServerHandler implements IServerHandler {
     private LinkedBlockingQueue<Message> messagesQueue;
     private ArrayBlockingQueue<ServerTextMessage> history = Server.getHistory();
 
-    private int sessionID;
+    private int sessionID = -1;
 
     public ServerHandler(LinkedBlockingQueue<Message> messagesQueue) {
         this.messagesQueue = messagesQueue;
@@ -110,6 +110,12 @@ public class ServerHandler implements IServerHandler {
         Server.deleteUser(message.getSessionID());
         for (Client client : Server.getClientsList()) {
                 client.getMessagesQueue().add(new UserLogoutMessage(login));
+        }
+    }
+
+    public void deleteUser() {
+        if (sessionID != -1) {
+            Server.deleteUser(sessionID);
         }
     }
 

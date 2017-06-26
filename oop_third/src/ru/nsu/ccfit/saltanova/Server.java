@@ -1,5 +1,7 @@
 package ru.nsu.ccfit.saltanova;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import ru.nsu.ccfit.saltanova.messages.Message;
 import ru.nsu.ccfit.saltanova.messages.ServerTextMessage;
 
@@ -18,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 public class Server {
 
     static {
-        System.getProperties().setProperty("log4j.configurationFile", "./log4j2.xml");
+        System.getProperties().setProperty("log4j.configurationFile", "C:\\Users\\NIKKY\\Desktop\\Gee\\labs\\15201-saltanova\\oop_third\\src\\log4j2.xml");
     }
 
     private static UsersList list = new UsersList();
@@ -27,14 +29,20 @@ public class Server {
     private List<AllClientThreads> clients = new ArrayList<>();
     private Thread objectListener;
     private Thread xmlListener;
+    private ServerSocket socketObjListener;
+    private ServerSocket socketXMLListener;
     private final Object lock = new Object();
 
     private static final Logger log = LogManager.getLogger("log");
 
     public static void main(String[] args) {
         try {
+            Logger logger = LogManager.getRootLogger();
+            if (!Config.LOGGING){
+                Configurator.setLevel(logger.getName(), Level.OFF);
+            }
             Server server = new Server();
-            System.out.println("write \"exit\" to stop server");
+            log.info("write \"exit\" to stop server");
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             while (true) {
                 if (br.readLine().equals("exit")) {
@@ -49,6 +57,12 @@ public class Server {
     }
 
     public Server() {
+        try {
+            socketObjListener =  new ServerSocket(Config.PORT1);
+            socketXMLListener = new ServerSocket(Config.PORT2);
+        } catch (IOException e) {
+            log.info(e.getMessage());
+        }
         objectListener = new Thread(new ObjectServerListener());
         objectListener.start();
         xmlListener = new Thread(new XMLServerListener());
@@ -59,67 +73,66 @@ public class Server {
 
         @Override
         public void run() {
-            ServerSocket socketListener;
             try {
-                socketListener = new ServerSocket(Config.PORT1);
                 log.info("started obj thread on port " + Config.PORT1);
                 while (true) {
-                        Socket client = null;
-                        while (client == null) {
-                            client = socketListener.accept();
-                        }
-                        client.setKeepAlive(true);
-                        synchronized (lock) {
-                            clients.add(new ClientThread(client));
-                        }
-                        log.info("new obj client");
+                    Socket client = null;
+                    while (client == null) {
+                        client = socketObjListener.accept();
+                    }
+                    client.setKeepAlive(true);
+                    synchronized (lock) {
+                        clients.add(new ClientThread(client));
+                    }
                 }
             } catch (IOException e) {
                 log.info("socket closed");
+            } finally {
+                log.info("object thread stopped");
             }
         }
     }
 
     private class XMLServerListener implements Runnable {
-    @Override
+        @Override
         public void run() {
-        ServerSocket socketListener;
-        try {
-            socketListener = new ServerSocket(Config.PORT2);
-            log.info("started xml thread on port " + Config.PORT2);
-            while (true) {
-                Socket client = null;
-                while (client == null) {
-                    client = socketListener.accept();
+            try {
+                log.info("started xml thread on port " + Config.PORT2);
+                while (true) {
+                    Socket client = null;
+                    while (client == null) {
+                        client = socketXMLListener.accept();
+                    }
+                    client.setKeepAlive(true);
+                    synchronized (lock) {
+                        clients.add(new ClientXMLThread(client));
+                    }
                 }
-                client.setKeepAlive(true);
-                synchronized (lock) {
-                    clients.add(new ClientXMLThread(client));
-                }
-                log.info("new xml client");
-            }
             } catch (IOException e) {
                 log.info("socket closed");
+            } finally {
+                log.info("xml thread stopped");
             }
         }
     }
 
     private void stop() {
-        objectListener.interrupt();
-        xmlListener.interrupt();
         synchronized (lock) {
             for (AllClientThreads clientThread : clients) {
-                clientThread.stop();
+                    clientThread.stop();
             }
         }
-        if (objectListener.isAlive()) {
-            log.info("object thread wasnt interrupted");
+        try {
+            socketObjListener.close();
+            socketXMLListener.close();
+        } catch (IOException e) {
+            log.info("socket closing error");
         }
-        if (xmlListener.isAlive()) {
-            log.info("xml thread wasnt interrupted");
-
-
-
+        try {
+            objectListener.join();
+            xmlListener.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

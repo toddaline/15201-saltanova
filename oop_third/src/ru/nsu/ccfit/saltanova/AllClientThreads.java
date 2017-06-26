@@ -4,7 +4,5 @@ public abstract class AllClientThreads {
 
     abstract void stop();
 
-    abstract void banUser();
-
-
+    public abstract void banUser();
 }

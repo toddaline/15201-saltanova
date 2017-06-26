@@ -3,7 +3,6 @@ package ru.nsu.ccfit.saltanova;
 import ru.nsu.ccfit.saltanova.messages.Message;
 
 import java.io.*;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +49,6 @@ class UsersList  {
         String s = "";
         for (Map.Entry<Integer, Client> m : this.onlineUsers.entrySet()) {
             clientsList.add(m.getValue());
-            System.out.println(m.getKey());
             s = s + m.getKey();
         }
         return clientsList;

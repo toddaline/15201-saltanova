@@ -14,7 +14,7 @@ public class ClientHandler implements ObserverMessage {
     private String type;
     ServerListenerThread client;
 
-    public ClientHandler(ServerListenerThread client, LinkedBlockingQueue messagesQueue) {
+    public ClientHandler(ServerListenerThread client, LinkedBlockingQueue<Message> messagesQueue) {
         this.client = client;
         this.messagesQueue = messagesQueue;
     }
@@ -65,8 +65,8 @@ public class ClientHandler implements ObserverMessage {
 
     @Override
     public void process(LogoutSuccess message) {
-        client.stop();
         notifyObserver(message);
+        client.stop();
     }
 
     @Override

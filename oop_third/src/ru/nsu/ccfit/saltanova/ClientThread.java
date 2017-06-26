@@ -19,7 +19,6 @@ public class ClientThread extends AllClientThreads {
     private ObjectOutputStream outputStream = null;
     private ServerHandler serverHandler;
     private LinkedBlockingQueue<Message> messagesQueue;
-    private Socket socket;
     private Thread reader;
     private Thread writer;
 
@@ -27,12 +26,18 @@ public class ClientThread extends AllClientThreads {
 
     ClientThread(Socket socket) {
         try {
-            this.socket = socket;
             inputStream = new ObjectInputStream(socket.getInputStream());
             outputStream = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                socket.close();
+                log.info("problems with client");
+                return;
+            } catch (IOException e1) {
+                e.printStackTrace();
+            }
         }
+        log.info("new obj client");
         messagesQueue = new LinkedBlockingQueue<>();
         serverHandler = new ServerHandler(messagesQueue);
         reader = new Thread(new ClientReader());
@@ -49,8 +54,11 @@ public class ClientThread extends AllClientThreads {
                 while (true) {
                     ClientMessage message = (ClientMessage) inputStream.readObject();
                     message.process(serverHandler);
-                    log.info("received message from client");
+                    log.info("received message from client: " + message.getClass().getName());
                 }
+            } catch (NullPointerException e) {
+                banUser();
+                writer.interrupt();
             } catch (IOException | ClassNotFoundException e) {
                 writer.interrupt();
                 log.info("disconnected");
@@ -69,9 +77,9 @@ public class ClientThread extends AllClientThreads {
                     ServerMessage message = (ServerMessage) messagesQueue.take();
                     outputStream.writeObject(message);
                     outputStream.flush();
-                    log.info("sending message to client");
+                    log.info("sending message to client: " + message.getClass().getName());
                 }
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 log.info("thread was interrupted");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -83,18 +91,17 @@ public class ClientThread extends AllClientThreads {
 
     @Override
     public void stop() {
-        reader.interrupt();
+        if (reader != null) {
+            reader.interrupt();
+        }
     }
 
     @Override
     public void banUser() {
         log.info("user was banned");
+        messagesQueue.clear();
+        serverHandler.deleteUser();
         stop();
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
 

@@ -1,13 +1,9 @@
 package ru.nsu.ccfit.saltanova.messages;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ClientHandlerXML implements ObserverMessage {
@@ -32,7 +28,6 @@ public class ClientHandlerXML implements ObserverMessage {
             from.setTextContent(message.getLogin());
             root.appendChild(from);
             messagesQueue.add(document);
-            toXML(document);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
@@ -57,7 +52,6 @@ public class ClientHandlerXML implements ObserverMessage {
                 user.appendChild(type);
             }
             messagesQueue.add(document);
-            toXML(document);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
@@ -130,7 +124,6 @@ public class ClientHandlerXML implements ObserverMessage {
             Element root = document.createElement("success");
             document.appendChild(root);
             messagesQueue.add(document);
-            toXML(document);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
@@ -192,21 +185,6 @@ public class ClientHandlerXML implements ObserverMessage {
             messagesQueue.add(document);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void toXML(Document document) {
-        try {
-            OutputFormat format = new OutputFormat(document);
-            format.setLineWidth(65);
-            format.setIndenting(true);
-            format.setIndent(2);
-            Writer out = new StringWriter();
-            XMLSerializer serializer = new XMLSerializer(out, format);
-            serializer.serialize(document);
-            System.out.println("toXML: " + out.toString());
-        } catch (Exception e) {
-            //           throw new RuntimeException(e);
         }
     }
 }

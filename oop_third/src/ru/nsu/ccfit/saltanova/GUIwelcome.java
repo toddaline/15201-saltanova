@@ -56,16 +56,14 @@ public class GUIwelcome extends JFrame {
                 if (objButton.isSelected()) {
                     ServerListenerThread client = new ServerListenerThread();
                     new Thread(() -> client.connect(IP, Integer.parseInt(serverPort), "obj")).start();
-                    System.out.println("obj version");
                     dispose();
                 } else if (xmlButton.isSelected()) {
                     ServerListenerThread client = new ServerListenerThread();
                     new Thread(() -> client.connect(IP, Integer.parseInt(serverPort), "xml")).start();
-                    System.out.println("xml version");
                     dispose();
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "nedopusk");
+                JOptionPane.showMessageDialog(this, "Wrong format");
             }
         });
     }

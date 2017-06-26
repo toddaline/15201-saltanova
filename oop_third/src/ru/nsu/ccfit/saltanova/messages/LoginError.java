@@ -3,7 +3,7 @@ package ru.nsu.ccfit.saltanova.messages;
 
 public class LoginError implements ServerMessage {
 
-    String reason;
+    private String reason;
 
     public LoginError(String reason) {
         this.reason = reason;

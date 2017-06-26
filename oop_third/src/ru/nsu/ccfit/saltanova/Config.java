@@ -14,32 +14,33 @@ public class Config {
     public static int PORT1;
     public static int PORT2;
     public static int HISTORY_LENGTH;
+    public static boolean LOGGING;
 
     private static final Logger log = LogManager.getLogger("log");
 
     static {
 
-    Properties properties = new Properties();
-    FileInputStream propertiesFile = null;
+        Properties properties = new Properties();
+        FileInputStream propertiesFile = null;
 
         try {
-        propertiesFile = new FileInputStream(PROPERTIES_FILE);
-        properties.load(propertiesFile);
-
-        PORT1 = Integer.parseInt(properties.getProperty("PORT1"));
-        PORT2 = Integer.parseInt(properties.getProperty("PORT2"));
-        HISTORY_LENGTH = Integer.parseInt(properties.getProperty("HISTORY_LENGTH"));
-    } catch (FileNotFoundException e) {
-        log.info("no config file");
-    } catch (IOException e) {
-        log.info("file reading error");
-    } finally {
-        try {
-            assert propertiesFile != null;
-            propertiesFile.close();
+            propertiesFile = new FileInputStream(PROPERTIES_FILE);
+            properties.load(propertiesFile);
+            PORT1 = Integer.parseInt(properties.getProperty("PORT1"));
+            PORT2 = Integer.parseInt(properties.getProperty("PORT2"));
+            HISTORY_LENGTH = Integer.parseInt(properties.getProperty("HISTORY_LENGTH"));
+            LOGGING = Boolean.parseBoolean(properties.getProperty("LOGGING"));
+        } catch (FileNotFoundException e) {
+            log.info("no config file");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.info("file reading error");
+        } finally {
+            try {
+                assert propertiesFile != null;
+                propertiesFile.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
-}
 }

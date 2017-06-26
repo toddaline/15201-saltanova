@@ -8,10 +8,6 @@ public class RequestList implements ClientMessage {
         this.sessionID = sessionID;
     }
 
-    void setSessionID(int sessionID) {
-        this.sessionID = sessionID;
-    }
-
     int getSessionID() {
         return sessionID;
     }

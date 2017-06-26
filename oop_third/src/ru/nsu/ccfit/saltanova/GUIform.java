@@ -29,8 +29,6 @@ public class GUIform extends JFrame implements ObserverMessage {
             }
         };
 
-//        log.info("gui started");
-
         this.addWindowListener(exitListener);
         textField = new JTextArea("Welcome to chat\n",15,10);
         textField.setLineWrap(true);
@@ -132,7 +130,7 @@ public class GUIform extends JFrame implements ObserverMessage {
     @Override
     public void process(LogoutSuccess message) {
         log.info("disconnected successfully");
-        System.exit(0);
+        Thread.currentThread().interrupt();
     }
 
     @Override
@@ -140,5 +138,4 @@ public class GUIform extends JFrame implements ObserverMessage {
         log.info("logout error");
         System.exit(-1);
     }
-    
 }

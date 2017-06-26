@@ -2,7 +2,7 @@ package ru.nsu.ccfit.saltanova.messages;
 
 public class RequestListError implements ServerMessage {
 
-    private String reason = "r u kidding me?";
+    private String reason;
 
     public RequestListError(String reason) {
         this.reason = reason;

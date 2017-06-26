@@ -1,7 +1,7 @@
 package ru.nsu.ccfit.saltanova;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -49,12 +49,16 @@ public class ServerListenerThread {
     }
 
     public static void main(String[] args) {
+        Logger logger = LogManager.getRootLogger();
+        if (!Config.LOGGING){
+            Configurator.setLevel(logger.getName(), Level.OFF);
+        }
         new GUIwelcome();
     }
 
     void connect(String ip, int serverPort, String version) {
         try {
-            System.out.println(serverPort);
+            log.info("connected to port: " + serverPort);
             socket = new Socket(ip, serverPort);
             socket.setKeepAlive(true);
             clientHandler = new ClientHandler(this, messagesQueue);
@@ -90,11 +94,12 @@ public class ServerListenerThread {
                 while (true) {
                     ServerMessage message = (ServerMessage) objectInputStream.readObject();
                     message.process(clientHandler);
+                    log.info("received message to server: " + message.getClass().getName());
                 }
             } catch (IOException | ClassNotFoundException e) {
-                writer.interrupt();
-                log.info("reader closed");
                 log.info("socket was closed");
+            } finally {
+                log.info("reader thread closed");
             }
         }
     }
@@ -107,12 +112,16 @@ public class ServerListenerThread {
                 userName = JOptionPane.showInputDialog("Enter your username");
                 messagesQueue.add(new AddUserMessage(userName, "obj"));
                 while (true) {
-                    objectOutputStream.writeObject(messagesQueue.take());
+                    ClientMessage message = (ClientMessage) messagesQueue.take();
+                    objectOutputStream.writeObject(message);
+                    log.info("sending message to server: " + message.getClass().getName());
                     objectOutputStream.flush();
                 }
             } catch (InterruptedException e) {
                 log.info("writer thread interrupted");
             } catch (IOException e) {
+            } finally {
+                log.info("writer thread closed");
             }
         }
     }
@@ -123,18 +132,13 @@ public class ServerListenerThread {
         public void run() {
             try {
                 while (true) {
-                    int length = dataInputStream.readInt();  // + обработка если длина отрицательная?
-                    if (length < 0) {
-                        System.out.println("negative length: " + length);
-                    }
+                    int length = dataInputStream.readInt();
                     byte[] buffer = new byte[length];
                     int read = 0;
                     while (read != length) {
                         int temp = dataInputStream.read(buffer, read, length - read);
                         read += temp;
                     }
-
-                    // проверка на то что длина сообщения действительно такая?
 
                     DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                     Document document = documentBuilder.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(buffer, 0, length), "UTF-8")));
@@ -165,11 +169,6 @@ public class ServerListenerThread {
                         break;
                         case "success":
                         ClientMessage responseSuccess = (ClientMessage) responseMessages.take();
-
-
-                        System.out.println(toXML(document));
-
-
                         if (responseSuccess instanceof AddUserMessage || responseSuccess instanceof RequestList) {
                             if (root.getChildNodes().item(0).getNodeName().equals("session")) {
                                 message = new LoginSuccess(Integer.parseInt(document.getElementsByTagName("session").item(0).getTextContent()));
@@ -190,14 +189,17 @@ public class ServerListenerThread {
                             message = new LogoutSuccess();
                         }
                     }
+                    log.info("received message from server: " + message.getClass().getName());
                     message.process(clientHandler);
                 }
             } catch (UnsupportedEncodingException | SAXException | ParserConfigurationException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.info("reader thread interrupted");
             } catch (IOException e) {
-                e.printStackTrace();
+                log.info("socket closed");
+            } finally {
+                log.info("reader thread closed");
             }
         }
     }
@@ -215,11 +217,13 @@ public class ServerListenerThread {
                     responseMessages.add(message);
                     message.process(serverHandlerXML);
                     sendMessage();
+                    log.info("sending message to server: " + message.getClass().getName());
                 }
             } catch (InterruptedException e) {
                 log.info("writer thread interrupted");
             } catch (IOException e) {
-                log.info("socket closed");
+            } finally {
+                log.info("writer thread closed");
             }
         }
     }
@@ -241,28 +245,12 @@ public class ServerListenerThread {
     }
 
     public void stop() {
-        writer.interrupt();
         try {
             socket.close();
-            log.info("socket was closed");
         } catch (IOException e) {
-            log.info("socket closing error");
             e.printStackTrace();
         }
-    }
-
-    public static String toXML(Document document) {
-        try {
-            OutputFormat format = new OutputFormat(document);
-            format.setLineWidth(65);
-            format.setIndenting(true);
-            format.setIndent(2);
-            Writer out = new StringWriter();
-            XMLSerializer serializer = new XMLSerializer(out, format);
-            serializer.serialize(document);
-            return out.toString();
-        } catch (Exception e) {
-        }
-        return null;
+        reader.interrupt();
+        writer.interrupt();
     }
 }
