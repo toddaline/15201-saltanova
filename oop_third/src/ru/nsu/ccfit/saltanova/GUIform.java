@@ -34,7 +34,7 @@ public class GUIform extends JFrame implements ObserverMessage {
         textField.setLineWrap(true);
         textField.setWrapStyleWord(true);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setBounds(300,300,600,600);
+        this.setBounds(200,200,600,500);
         this.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
