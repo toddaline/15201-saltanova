@@ -17,8 +17,8 @@ public class Config {
     public static boolean LOGGING;
 
     private static final Logger log = LogManager.getLogger("log");
-
     static {
+
 
         Properties properties = new Properties();
         FileInputStream propertiesFile = null;
