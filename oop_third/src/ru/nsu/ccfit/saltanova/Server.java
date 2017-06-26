@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 public class Server {
 
     static {
-        System.getProperties().setProperty("log4j.configurationFile", "C:\\Users\\NIKKY\\Desktop\\Gee\\labs\\15201-saltanova\\oop_third\\src\\log4j2.xml");
+        System.getProperties().setProperty("log4j.configurationFile", "src/log4j2.xml");
     }
 
     private static UsersList list = new UsersList();

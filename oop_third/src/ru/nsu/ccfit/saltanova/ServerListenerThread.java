@@ -45,7 +45,7 @@ public class ServerListenerThread {
     private static final Logger log = LogManager.getLogger("log");
 
     static {
-        System.getProperties().setProperty("log4j.configurationFile", "./log4j2.xml");
+        System.getProperties().setProperty("log4j.configurationFile", "src/log4j2.xml");
     }
 
     public static void main(String[] args) {

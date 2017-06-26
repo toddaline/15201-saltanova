@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 
 public class Config {
 
-    private static final String PROPERTIES_FILE = "C:\\Users\\NIKKY\\Desktop\\Gee\\labs\\15201-saltanova\\oop_third\\src\\config.properties";
+    private static final String PROPERTIES_FILE = "src/config.properties";
 
     public static int PORT1;
     public static int PORT2;
