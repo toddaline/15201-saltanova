@@ -41,7 +41,7 @@ public class ServerHandler implements IServerHandler {
             messagesQueue.add(new LoginSuccess(sessionID));
             Server.addUser(message.getLogin(), sessionID, message.getType(), messagesQueue);
 
-            for (ServerTextMessage m : history) {
+            for (int i = 0; i < history.size(); ++i) {
                 ServerTextMessage historyMessage = history.take();
                 messagesQueue.add(historyMessage);
                 history.add(historyMessage);
