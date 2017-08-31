@@ -10,13 +10,15 @@ public class ClientHandler implements ObserverMessage {
 
     private int sessionID = -1;
     private LinkedBlockingQueue<Message> messagesQueue;
+    private LinkedBlockingQueue<UserTextMessage> textMessages;
     private Observer observer;
     private String type;
     ServerListenerThread client;
 
-    public ClientHandler(ServerListenerThread client, LinkedBlockingQueue<Message> messagesQueue) {
+    public ClientHandler(ServerListenerThread client, LinkedBlockingQueue<Message> messagesQueue, LinkedBlockingQueue<UserTextMessage> textMessages) {
         this.client = client;
         this.messagesQueue = messagesQueue;
+        this.textMessages = textMessages;
     }
 
     public void process(LoginSuccess message) {
@@ -38,7 +40,9 @@ public class ClientHandler implements ObserverMessage {
     }
 
     @Override
-    public void process(TextMessageSuccess message) {}
+    public void process(TextMessageSuccess message) {
+        notifyObserver(message);
+    }
 
     @Override
     public void process(ServerTextMessage message) {
@@ -93,6 +97,19 @@ public class ClientHandler implements ObserverMessage {
 
     public void addNewMessage(Message message) {
         messagesQueue.add(message);
+    }
+
+    public UserTextMessage takeTextMessage() {
+        try {
+            return textMessages.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getLogin() {
+        return client.getLogin();
     }
 
     public void setType(String type) {

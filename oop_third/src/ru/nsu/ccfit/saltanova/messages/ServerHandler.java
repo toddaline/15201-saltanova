@@ -49,7 +49,7 @@ public class ServerHandler implements IServerHandler {
 
             for (Client client : Server.getClientsList()) {
                 if (!client.getLogin().equals(message.getLogin())) {
-                    client.getMessagesQueue().add(new UserLoginMessage(message.getLogin()));
+                    client.getMessagesQueue().add(new UserLoginMessage(message.getLogin(), message.getType()));
                 }
             }
 
@@ -71,7 +71,9 @@ public class ServerHandler implements IServerHandler {
         ServerTextMessage textMessage = new ServerTextMessage(Server.findUser(message.getSessionID()), message.getMessage());
 
         for (Client client : Server.getClientsList()) {
-            client.getMessagesQueue().add(textMessage);
+            if (client.getSessionID() != message.getSessionID()) {
+                client.getMessagesQueue().add(textMessage);
+            }
         }
 
         if (history.remainingCapacity() == 0 ) {

@@ -25,7 +25,7 @@ public class ServerHandlerXML implements IServerHandler {
             name.setTextContent(message.getLogin());
             root.appendChild(name);
             Element type = document.createElement("type");
-            type.setTextContent(message.getType());                    //redo this in message class
+            type.setTextContent(message.getType());
             root.appendChild(type);
             docMessagesQueue.add(document);
         } catch (ParserConfigurationException e) {

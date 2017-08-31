@@ -24,7 +24,7 @@ public class ClientHandlerXML implements ObserverMessage {
             Element m = document.createElement("message");
             m.setTextContent(message.getMessage());
             root.appendChild(m);
-            Element from = document.createElement("login");
+            Element from = document.createElement("name");
             from.setTextContent(message.getLogin());
             root.appendChild(from);
             messagesQueue.add(document);
@@ -48,7 +48,7 @@ public class ClientHandlerXML implements ObserverMessage {
                 name.setTextContent(s);
                 user.appendChild(name);
                 Element type = document.createElement("type");
-                type.setTextContent("xml");                                //redo!
+                type.setTextContent("xml");
                 user.appendChild(type);
             }
             messagesQueue.add(document);
@@ -139,6 +139,9 @@ public class ClientHandlerXML implements ObserverMessage {
             Element name = document.createElement("name");
             name.setTextContent(message.getLogin());
             root.appendChild(name);
+            Element type = document.createElement("type");
+            type.setTextContent(message.getType());
+            root.appendChild(type);
             messagesQueue.add(document);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

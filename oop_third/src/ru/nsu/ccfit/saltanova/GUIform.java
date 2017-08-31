@@ -13,11 +13,13 @@ public class GUIform extends JFrame implements ObserverMessage {
     private JTextArea textField;
     private JTextArea onlineField = new JTextArea("Online users:\n",15,10);
     private JTextField messageField = new JTextField();
+    private ClientHandler client;
 
     private static final Logger log = LogManager.getLogger("log");
 
     public GUIform(ClientHandler client) {
         super("u dont need this chat because u dont have friends");
+        this.client = client;
 
         client.addObserver((ServerMessage message) -> message.process(this));
 
@@ -83,6 +85,15 @@ public class GUIform extends JFrame implements ObserverMessage {
         textField.scrollRectToVisible(rect);
     }
 
+
+    @Override
+    public void process(TextMessageSuccess message) {
+        textField.append("[ " + java.util.Calendar.getInstance().getTime() + " ] " + client.getLogin() + " : " + client.takeTextMessage().getMessage() + "\n");
+        java.awt.Rectangle rect = new java.awt.Rectangle(0, textField.getHeight(), 1, 1);
+        textField.scrollRectToVisible(rect);
+
+    }
+
     @Override
     public void process(RequestListSuccess message) {
         if (message.getUsersList() != null){
@@ -111,9 +122,6 @@ public class GUIform extends JFrame implements ObserverMessage {
     public void process(TextMessageError message) {
         textField.append(message.getReason() + "\n");
     }
-
-    @Override
-    public void process(TextMessageSuccess message) {}
 
     @Override
     public void process(UserLoginMessage message) {

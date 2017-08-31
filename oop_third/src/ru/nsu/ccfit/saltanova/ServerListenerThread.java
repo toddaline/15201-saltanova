@@ -3,7 +3,9 @@ package ru.nsu.ccfit.saltanova;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import ru.nsu.ccfit.saltanova.messages.*;
@@ -36,6 +38,7 @@ public class ServerListenerThread {
     private ServerHandlerXML serverHandlerXML;
     private LinkedBlockingQueue<Message> messagesQueue = new LinkedBlockingQueue<>();
     private LinkedBlockingQueue<Message> responseMessages = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<UserTextMessage> textMessages = new LinkedBlockingQueue<>();
     private Thread reader;
     private Thread writer;
     private static String userName = "";
@@ -61,7 +64,7 @@ public class ServerListenerThread {
             log.info("connected to port: " + serverPort);
             socket = new Socket(ip, serverPort);
             socket.setKeepAlive(true);
-            clientHandler = new ClientHandler(this, messagesQueue);
+            clientHandler = new ClientHandler(this, messagesQueue, textMessages);
             switch (version) {
                 case "obj":
                     objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -116,6 +119,9 @@ public class ServerListenerThread {
                     objectOutputStream.writeObject(message);
                     log.info("sending message to server: " + message.getClass().getName());
                     objectOutputStream.flush();
+                    if (message instanceof UserTextMessage) {
+                        textMessages.add((UserTextMessage)message);
+                    }
                 }
             } catch (InterruptedException e) {
                 log.info("writer thread interrupted");
@@ -148,9 +154,9 @@ public class ServerListenerThread {
                     switch (root.getNodeName()) {
                         case "event":
                         if (root.getAttributes().getNamedItem("name").getNodeValue().equals("message")) {
-                            message = new ServerTextMessage(document.getElementsByTagName("login").item(0).getTextContent(), document.getElementsByTagName("message").item(0).getTextContent());
+                            message = new ServerTextMessage(document.getElementsByTagName("name").item(0).getTextContent(), document.getElementsByTagName("message").item(0).getTextContent());
                         } else if (root.getAttributes().getNamedItem("name").getNodeValue().equals("userlogin")) {
-                            message = new UserLoginMessage(document.getElementsByTagName("name").item(0).getTextContent());
+                            message = new UserLoginMessage(document.getElementsByTagName("name").item(0).getTextContent(), document.getElementsByTagName("type").item(0).getTextContent());
                         } else if (root.getAttributes().getNamedItem("name").getNodeValue().equals("userlogout")) {
                             message = new UserLogoutMessage(document.getElementsByTagName("name").item(0).getTextContent());
                         }
@@ -170,16 +176,16 @@ public class ServerListenerThread {
                         case "success":
                         ClientMessage responseSuccess = (ClientMessage) responseMessages.take();
                         if (responseSuccess instanceof AddUserMessage || responseSuccess instanceof RequestList) {
-                            if (root.getChildNodes().item(0).getNodeName().equals("session")) {
+                            NodeList list = document.getElementsByTagName("user");
+                            if (list.getLength() == 0) {
                                 message = new LoginSuccess(Integer.parseInt(document.getElementsByTagName("session").item(0).getTextContent()));
-                            } else if (root.getChildNodes().item(0).getNodeName().equals("listusers")) {
-                                int listLength = root.getChildNodes().item(0).getChildNodes().getLength();
+                            } else {
+                                int listLength = document.getElementsByTagName("user").getLength();
                                 String[] users = new String[listLength];
                                 String[] types = new String[listLength];
                                 for (int i = 0; i < listLength; i++) {
-                                    Node node = root.getChildNodes().item(0).getChildNodes().item(i);
-                                    users[i] = node.getChildNodes().item(0).getTextContent();
-                                    types[i] = node.getChildNodes().item(1).getTextContent();
+                                    users[i] = ((Element)(list.item(i).getChildNodes())).getElementsByTagName("name").item(0).getTextContent();
+                                    types[i] = ((Element)(list.item(i).getChildNodes())).getElementsByTagName("type").item(0).getTextContent();
                                 }
                                 message = new RequestListSuccess(users, types);
                             }
@@ -217,6 +223,9 @@ public class ServerListenerThread {
                     responseMessages.add(message);
                     message.process(serverHandlerXML);
                     sendMessage();
+                    if (message instanceof UserTextMessage) {
+                        textMessages.add((UserTextMessage)message);
+                    }
                     log.info("sending message to server: " + message.getClass().getName());
                 }
             } catch (InterruptedException e) {
@@ -242,6 +251,10 @@ public class ServerListenerThread {
         } catch (TransformerException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getLogin() {
+        return userName;
     }
 
     public void stop() {

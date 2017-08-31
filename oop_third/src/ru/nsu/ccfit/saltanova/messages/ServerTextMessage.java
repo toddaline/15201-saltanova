@@ -1,6 +1,6 @@
 package ru.nsu.ccfit.saltanova.messages;
 
-public class ServerTextMessage implements ServerMessage {  //на самом деле это типа сообщение от пользователя
+public class ServerTextMessage implements ServerMessage {
 
     private String login = "";
     private String message;
