@@ -1,0 +1,60 @@
+<project name="Chat" default="dist" basedir=".">
+
+    <property name="client.name" value="Client"/>
+    <property name="server.name" value="Server"/>
+    <property name="client.main.class" value="ru.nsu.ccfit.saltanova.ServerListenerThread"/>
+    <property name="server.main.class" value="ru.nsu.ccfit.saltanova.Server"/>
+    <property name="src.dir" location="src"/>
+    <property name="build.dir" location="build"/>
+    <property name="lib.dir" location="lib"/>
+
+    <path id="libraries">
+        <fileset dir="${lib.dir}" includes="javac2-7.0.3.jar"/>
+        <fileset dir="${lib.dir}" includes="log4j-api-2.8.1.jar"/>
+        <fileset dir="${lib.dir}" includes="log4j-core-2.8.2.jar"/>
+    </path>
+
+    <target name="init" depends="clean">
+        <mkdir dir="${build.dir}"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac classpathref="libraries" srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" fork="true" nowarn="off"/>
+    </target>
+
+    <target name="dist" depends="compile">
+        <jar destfile="${client.name}.jar" basedir="${build.dir}">
+            <zipgroupfileset dir="${lib.dir}" includes="*.jar" />
+            <manifest>
+                <attribute name="Main-Class" value="${client.main.class}"/>
+            </manifest>
+        </jar>
+        <jar destfile="${server.name}.jar" basedir="${build.dir}">
+            <zipgroupfileset dir="${lib.dir}" includes="*.jar" />
+            <manifest>
+                <attribute name="Main-Class" value="${server.main.class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run-server">
+        <java jar="${server.name}.jar" fork="true" >
+            <sysproperty key="log4j.configurationFile" value="file:${src.dir}/log4j2.xml"/>
+            <classpath refid="libraries"/>
+        </java>
+    </target>
+
+    <target name="run-client">
+        <java jar="${client.name}.jar" fork="true" >
+            <sysproperty key="log4j.configurationFile" value="file:${src.dir}/log4j2.xml"/>
+            <classpath refid="libraries"/>
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete file="${client.name}.jar"/>
+        <delete file="${server.name}.jar"/>
+    </target>
+
+</project>
